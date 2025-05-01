@@ -7,9 +7,20 @@ const totalSteps = 6; // Remains 6 steps (incl. review)
 // Object to track the validation status of each step
 const stepValidity = {};
 
+// --- Reference Library Definition ---
+const referenceLibrary = [
+    { label: "Cardano Blockchain Ecosystem Constitution", uri: "ipfs://bafkreiazhhawe7sjwuthcfgl3mmv2swec7sukvclu3oli7qdyz4uhhuvmy" },
+    { label: "GovTool", uri: "https://gov.tools/" },
+    { label: "CIP-100 (Governance Metadata)", uri: "https://cips.cardano.org/cip/CIP-0100" },
+    { label: "CIP-136 (CC Vote Metadata)", uri: "https://cips.cardano.org/cip/CIP-0136" },
+    { label: "CIP-1694 (Governance Framework)", uri: "https://cips.cardano.org/cip/CIP-1694" },
+    // Add more common references here
+];
+
 // --- DOMContentLoaded Listener ---
 document.addEventListener('DOMContentLoaded', () => {
     showStep(1); // Show the first step on load
+    populateReferenceLibraryDropdown(); // Populate the library dropdown
 
     // --- Summary Character Counter Setup ---
     const summaryTextarea = document.getElementById('summary');
@@ -23,6 +34,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+
+// --- Reference Library Functions ---
+
+/**
+ * Populates the reference library dropdown menu.
+ */
+function populateReferenceLibraryDropdown() {
+    const selectElement = document.getElementById('library-select');
+    if (!selectElement) return;
+
+    referenceLibrary.forEach((item, index) => {
+        const option = document.createElement('option');
+        option.value = index; // Use index as value for easy lookup
+        option.textContent = item.label; // Display label to the user
+        selectElement.appendChild(option);
+    });
+}
+
+/**
+ * Adds the selected library reference to the specified textarea.
+ * @param {string} targetTextareaId - The ID of the textarea ('relevantArticles' or 'otherReferences').
+ */
+function addLibraryReference(targetTextareaId) {
+    const selectElement = document.getElementById('library-select');
+    const targetTextarea = document.getElementById(targetTextareaId);
+
+    if (!selectElement || !targetTextarea || selectElement.value === "") {
+        // No selection or elements not found
+        return;
+    }
+
+    const selectedIndex = parseInt(selectElement.value, 10);
+    const selectedRef = referenceLibrary[selectedIndex];
+
+    if (selectedRef) {
+        const referenceString = `${selectedRef.label} | ${selectedRef.uri}`;
+        // Append to textarea, adding a newline if needed
+        if (targetTextarea.value.trim() !== '') {
+            targetTextarea.value += '\n' + referenceString;
+        } else {
+            targetTextarea.value = referenceString;
+        }
+        // Optionally reset dropdown after adding
+        // selectElement.value = "";
+    }
+}
 
 
 // --- Step Navigation and Validation Functions ---
@@ -43,6 +101,7 @@ function updateStepStatusDisplay(stepNumber) {
         }
     }
 }
+
 
 /**
  * Hides all form steps and displays the specified step number.
@@ -81,7 +140,7 @@ function validateStep(stepNumber, showAlerts = true) {
     if (!stepElement) return false;
 
     const requiredInputs = stepElement.querySelectorAll('input[required], textarea[required]');
-    let isValid = true;
+    let isValid = true; // Assume valid initially
     let firstErrorMessage = '';
 
     // Check required fields first
@@ -97,7 +156,7 @@ function validateStep(stepNumber, showAlerts = true) {
 
     // Don't proceed with specific checks if a required field failed
     if (!isValid) {
-        stepValidity[stepNumber] = false;
+        stepValidity[stepNumber] = false; // Store invalid status
         return false;
     }
 
@@ -121,10 +180,10 @@ function validateStep(stepNumber, showAlerts = true) {
              }
          });
     }
-    // Add more specific validation rules here if needed
+    // Add more specific validation rules here if needed for other steps
 
     stepValidity[stepNumber] = isValid; // Store final result
-    return isValid;
+    return isValid; // Return the final validation status
 }
 
 /**
@@ -143,9 +202,17 @@ function runFinalValidation() {
             overallValid = false;
             // Construct a more helpful error message
             const stepElement = document.getElementById(`step-${stepNum}`);
-            const firstInvalidInput = stepElement.querySelector('input:invalid, textarea:invalid, input[type="number"]:invalid'); // Basic check, might need refinement
-            const fieldName = firstInvalidInput?.previousElementSibling?.textContent || `Step ${stepNum}`;
-            finalMessage = `Verification failed: Please check required fields or constraints in ${fieldName}.`;
+            // Find the first input that failed the required check (more reliable)
+            let firstInvalidInput = null;
+            const reqInputs = stepElement.querySelectorAll('input[required], textarea[required]');
+            for(const input of reqInputs) {
+                if(!input.value.trim()) {
+                    firstInvalidInput = input;
+                    break;
+                }
+            }
+            const fieldName = firstInvalidInput?.previousElementSibling?.textContent || `a required field in Step ${stepNum}`;
+            finalMessage = `Verification failed: Please check ${fieldName}.`;
             break; // Stop on first failure
         }
     }
