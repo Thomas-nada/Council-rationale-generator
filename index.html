@@ -116,34 +116,61 @@
                         </select>
                 </div>
                 <div class="library-buttons">
-                    <button type="button" class="library-add-button" onclick="addLibraryReference('relevantArticles')">Add to Relevant Articles</button>
-                    <button type="button" class="library-add-button" onclick="addLibraryReference('otherReferences')">Add to Other References</button>
+                    <button type="button" class="library-add-button" onclick="addLibraryReference('relevant')">Add to Relevant Articles</button>
+                    <button type="button" class="library-add-button" onclick="addLibraryReference('other')">Add to Other References</button>
                 </div>
             </div>
-            <p style="margin-top: 20px;">Manually enter references using the format: <strong>Label | URI</strong> (one per line).</p>
-            <div class="form-group">
-                <label for="relevantArticles">Relevant Constitution Articles:</label>
-                <textarea id="relevantArticles" rows="5" placeholder="Enter one per line. Format: Label | URI/Identifier (e.g., Constitution Article III | cardano:constitution:article-III)"></textarea>
-                <small>List relevant constitution articles using the "Label | URI" format.</small>
+
+            <div class="manual-reference-adder">
+                <h3>Add Manual Reference</h3>
+                <div class="form-group">
+                    <label for="manualRefLabel">Reference Label:</label>
+                    <input type="text" id="manualRefLabel" placeholder="e.g., Constitution Article III">
+                </div>
+                <div class="form-group">
+                    <label for="manualRefUri">Reference URI:</label>
+                    <input type="text" id="manualRefUri" placeholder="e.g., cardano:constitution:article-III or https://...">
+                </div>
+                <div class="form-group">
+                     <label for="manualRefTarget">Add to:</label>
+                     <select id="manualRefTarget">
+                         <option value="relevant">Relevant Constitution Articles</option>
+                         <option value="other">Other References</option>
+                     </select>
+                </div>
+                <button type="button" class="manual-add-button" onclick="addManualReference()">Add Manual Reference</button>
+                <div id="manual-ref-error" class="manual-ref-message error" style="display: none;"></div>
             </div>
-            <div class="form-group">
-                <label for="otherReferences">Other References (e.g., GovAction Link):</label>
-                <textarea id="otherReferences" rows="5" placeholder="Enter one per line. Format: Label | URI (e.g., Link to GovAction | https://gov.tools/...)"></textarea>
-                <small>List other relevant URIs using the "Label | URI" format.</small>
-				<p class="mt-4 text-sm text-gray-600">
+
+            <div class="references-display-area">
+                <h4>Added Relevant Articles:</h4>
+                <ul id="relevantArticlesDisplay" class="references-list">
+                    </ul>
+
+                <div id="constitution-articles-selector" style="display: none;" class="form-group constitution-selector">
+                    <label>Select Relevant Constitution Sections/Articles:</label>
+                    <div id="constitution-checkboxes-container">
+                        </div>
+                    <small>Select all applicable sections for the rationale.</small>
+                </div>
+                <h4>Added Other References:</h4>
+                <ul id="otherReferencesDisplay" class="references-list">
+                     </ul>
+            </div>
+
+            <p style="margin-top: 20px;">
                 Want to add to the reference library? Please submit a pull request on GitHub:
                 <a href="https://github.com/Thomas-nada/Council-rationale-generator" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
                     https://github.com/Thomas-nada/Council-rationale-generator
                 </a>
             </p>
-            </div>
-             <div class="navigation-buttons">
+
+            <div class="navigation-buttons">
                 <button type="button" onclick="prevStep()">Previous</button>
                 <button type="button" onclick="nextStep()">Next</button>
             </div>
         </div>
-
-         <div class="step" id="step-6" style="display: none;">
+        <div class="step" id="step-6" style="display: none;">
              <h2>Step 6: Review and Generate</h2>
             <p>Please review the information below. Go back to previous steps to make changes if necessary. Click "Verify Metadata" to check for required fields before generating the file.</p>
             <div id="review-area">
@@ -154,7 +181,7 @@
                 <button type="button" id="verify-button" onclick="verifyMetadata()">Verify Metadata</button>
                 <button type="button" id="generate-button" onclick="generateJson()" disabled>Generate JSON File</button>
             </div>
-            <div id="error-message" class="error"></div>
+            <div id="error-message" class="error" style="display: none;"></div>
         </div>
 
     </form>
