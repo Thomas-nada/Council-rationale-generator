@@ -25,6 +25,13 @@ h2 {
     align-items: center;
 }
 
+h3 { /* Style for subheadings like in library */
+    color: #555;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
 /* --- Form Container --- */
 #metadata-form {
     background-color: #fff;
@@ -72,9 +79,10 @@ h2 {
     color: #555;
 }
 
-/* --- Input & Textarea Styling --- */
+/* --- Input, Textarea, Select Styling --- */
 .form-group input[type="text"],
 .form-group textarea,
+.form-group select, /* Added select */
 .form-group-inline input[type="number"] {
     width: 98%;
     padding: 12px;
@@ -82,10 +90,18 @@ h2 {
     border-radius: 4px;
     font-size: 1rem;
     transition: border-color 0.2s ease-in-out;
+    background-color: #fff; /* Ensure background for select */
 }
+/* Specific padding for select */
+.form-group select {
+     padding: 10px 12px; /* Adjust vertical padding for select */
+     height: auto; /* Allow natural height */
+}
+
 
 .form-group input[type="text"]:focus,
 .form-group textarea:focus,
+.form-group select:focus, /* Added select */
 .form-group-inline input[type="number"]:focus {
     border-color: #007bff;
     outline: none;
@@ -129,28 +145,54 @@ h2 {
     padding: 8px 10px;
 }
 
+/* --- Reference Library Section --- */
+.reference-library {
+    background-color: #f8f9fa; /* Light background */
+    border: 1px solid #dee2e6; /* Light border */
+    padding: 15px 20px;
+    border-radius: 5px;
+    margin-bottom: 25px; /* Space below library */
+}
+.library-buttons {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+    margin-top: 10px;
+}
+.library-add-button {
+    padding: 8px 15px; /* Smaller buttons */
+    border: none;
+    border-radius: 4px;
+    background-color: #17a2b8; /* Info color */
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.library-add-button:hover {
+    background-color: #138496;
+}
+
+
 /* --- Navigation Buttons --- */
 .navigation-buttons {
     margin-top: 25px;
     padding-top: 15px;
     border-top: 1px solid #eee;
     display: flex;
-    justify-content: space-between; /* Default */
-    gap: 10px; /* Add space between buttons */
+    justify-content: space-between;
+    gap: 10px;
 }
-/* Adjust justification for Step 6 to group verify/generate */
 #step-6 .navigation-buttons {
-    justify-content: space-between; /* Keep Previous left */
+    justify-content: space-between;
 }
-/* Group verify and generate buttons together */
 #step-6 .navigation-buttons > button:not(:first-child) {
-   margin-left: auto; /* Push verify/generate group to the right */
+   margin-left: auto;
 }
 #step-6 .navigation-buttons > button#verify-button {
-    margin-left: auto; /* Push verify to the right */
+    margin-left: auto;
 }
 #step-6 .navigation-buttons > button#generate-button {
-    margin-left: 10px; /* Space between verify and generate */
+    margin-left: 10px;
 }
 
 
@@ -172,7 +214,6 @@ h2 {
     transform: scale(0.98);
 }
 
-/* Style Previous button differently */
 .navigation-buttons button:first-child:not(:only-child) {
      background-color: #6c757d;
 }
@@ -180,26 +221,23 @@ h2 {
     background-color: #5a6268;
 }
 
-/* Style Verify button */
 #verify-button {
-    background-color: #ffc107; /* Yellow */
+    background-color: #ffc107;
     color: #333;
 }
 #verify-button:hover {
     background-color: #e0a800;
 }
 
-/* Style Generate button */
 #generate-button {
-     background-color: #28a745; /* Green */
+     background-color: #28a745;
 }
 #generate-button:hover {
     background-color: #218838;
 }
 
-/* Disabled button style */
 .navigation-buttons button:disabled {
-    background-color: #adb5bd; /* Grey */
+    background-color: #adb5bd;
     cursor: not-allowed;
     opacity: 0.65;
 }
@@ -223,17 +261,17 @@ h2 {
     border-radius: 4px;
     font-weight: bold;
     text-align: center;
-    margin-bottom: 15px; /* Add space below status */
+    margin-bottom: 15px;
 }
 #verification-status.success {
-    color: #155724; /* Dark green text */
-    background-color: #d4edda; /* Light green background */
-    border: 1px solid #c3e6cb; /* Green border */
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
 }
 #verification-status.failure {
-    color: #721c24; /* Dark red text */
-    background-color: #f8d7da; /* Light red background */
-    border: 1px solid #f5c6cb; /* Red border */
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
 }
 
 
