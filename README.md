@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-A web-based tool for Intersect's Constitutional Council members to generate CIP-136 compliant JSON metadata for vote rationales via a simple step-by-step process, adhering to the structure used in early examples.
+A web-based tool for Intersect's Constitutional Committee members to generate CIP-136 compliant JSON metadata for vote rationales via a simple step-by-step process, adhering to the structure used in early examples.
 
 ## Motivation
 
@@ -17,22 +17,23 @@ Manually creating this structured JSON metadata, especially with the specific ne
 
 ## Features
 
-* **Step-by-Step Guidance:** Breaks down the metadata creation process into logical steps.
-* **Reference Structure Adherence:** Generates JSON matching the specific nested `@context` and field placement (e.g., `references` inside `body`) seen in provided examples.
-* **CIP-136 Compliant Fields:** Covers all compulsory (`summary`, `rationaleStatement`) and optional (`precedentDiscussion`, `counterargumentDiscussion`, `conclusion`, `internalVote`) body fields defined in CIP-136.
+* **Step-by-Step Guidance:** Breaks down the metadata creation process into 6 logical steps.
+* **Reference Structure Adherence:** Generates JSON matching the specific nested `@context` and field placement (e.g., `references` inside `body`) based on CIP-100 and CIP-136 standards.
+* **CIP-136 Compliant Fields:** Covers compulsory (`summary`, `rationaleStatement`) and optional (`precedentDiscussion`, `counterargumentDiscussion`, `conclusion`, `internalVote`) body fields defined in CIP-136.
 * **CIP-100 Base Fields:** Includes essential fields like `hashAlgorithm` and `authors`.
-* **Live Step Validation:** Performs basic checks (e.g., required fields, summary length) directly in the browser as you navigate between steps. A checkmark (✓) appears next to the step title upon successful validation.
-* **Final Verification Step:** Requires clicking a "Verify Metadata" button in the final step to perform checks on all required data before enabling the download button.
+* **Reference Library:** Provides a dropdown of common references (like CIPs, GovTool, Constitution) to easily add to the metadata.
+* **Live Step Validation:** Performs basic checks (e.g., required fields, summary length, non-negative numbers) directly in the browser as you navigate between steps. A checkmark (✓) appears next to the step title upon successful validation.
+* **Final Verification Step:** Requires clicking a "Verify Metadata" button in the final step to perform checks on all required data (`hashAlgorithm`, `authors`, `summary`, `rationaleStatement`) before enabling the download button.
 * **Direct JSON Download:** Generates and downloads the complete metadata as a `cip136_metadata.json` file once verified.
 * **No Server Needed:** Runs entirely in the user's web browser as a static webpage.
 
 ## How Verification Works
 
-This tool employs two levels of client-side validation:
+This tool employs two levels of client-side validation implemented in JavaScript:
 
 1.  **Live Step Validation:**
     * **Trigger:** When you click the "Next" button on a step.
-    * **Checks:** Verifies that all `required` fields within that *specific step* are filled. It also checks basic constraints like the summary's character limit (Step 2) or non-negative numbers for votes (Step 4).
+    * **Checks:** Verifies that all `required` fields within that *specific step* are filled. It also checks basic constraints like the summary's character limit (max 300 chars in Step 2) or non-negative numbers for votes (Step 4).
     * **Feedback:** If validation passes, a checkmark (✓) appears next to the step title. If it fails, an alert message pops up indicating the first issue found, and navigation is blocked. This provides immediate feedback as you progress.
 
 2.  **Final Verification (Step 6):**
@@ -48,41 +49,46 @@ There are two ways to use this tool:
 
 **1. Using a Hosted Version (If Deployed)**
 
-* (If you deploy this using GitHub Pages or similar)
-    Access the tool directly via your hosted link: `[Link to your hosted tool]`
+* (If deployed using GitHub Pages or similar)
+    Access the tool directly via the hosted link: `[Link to your hosted tool]` *(Update this link if applicable)*
 
 **2. Running Locally**
 
 * **Clone the repository:**
     ```bash
-    git clone [https://github.com/your-username/intersect-council-rationale-generator.git](https://github.com/your-username/intersect-council-rationale-generator.git)
-    cd intersect-council-rationale-generator
+    git clone [https://github.com/Thomas-nada/Council-rationale-generator.git](https://github.com/Thomas-nada/Council-rationale-generator.git)
+    cd Council-rationale-generator
     ```
+    *(Repository URL updated based on `index.html`)*
 * **Open the tool:**
     Simply open the `index.html` file in your preferred web browser (e.g., Chrome, Firefox, Edge).
 
 **Using the Tool Interface:**
 
-1.  **Step 1: Basic Information**
-    * Enter the `Hash Algorithm` (defaults to `blake2b-256`).
-    * Enter the `Author(s)` details (one name per line or separated by semicolons).
+*(Steps updated based on `index.html` and `script.js`)*
+
+1.  **Step 1: Basic Information (Required Fields)**
+    * Enter the `Hash Algorithm` (defaults to `blake2b-256`). *Required*.
     * Optionally enter a `Subject` for your own reference (not included in the final JSON).
+    * Enter the `Author(s)` details (one name per line or separated by semicolons). *Required*.
     * Click "Next". A checkmark (✓) will appear by the Step 1 title if required fields are filled.
-2.  **Step 2: Core Rationale (Compulsory)**
-    * Provide a concise `Summary` (max 300 characters).
-    * Write the full `Rationale Statement`.
+2.  **Step 2: Core Rationale (Required Fields)**
+    * Provide a concise `Summary` (max 300 characters). *Required*. A character counter is displayed.
+    * Write the full `Rationale Statement` (Markdown supported). *Required*.
     * Click "Next". A checkmark will appear if required fields are filled and the summary length is valid.
 3.  **Step 3: Supporting Discussion (Optional)**
-    * Optionally, add discussions on `Precedent`, `Counterarguments`, and a `Conclusion`.
+    * Optionally, add discussions on `Precedent` (Markdown supported), `Counterarguments` (Markdown supported), and a `Conclusion` (Markdown *not* supported).
     * Click "Next". A checkmark will appear (as this step has no required fields, it's always considered 'valid' for navigation).
 4.  **Step 4: Internal Voting (Optional)**
-    * If relevant, enter the non-negative integer counts for internal votes.
+    * If relevant, enter the non-negative integer counts for internal `Constitutional Votes`, `Unconstitutional Votes`, `Abstain Votes`, and `Did Not Vote`.
+    * An additional field `Votes Against Voting` is present but noted as not part of the standard reference JSON.
     * Click "Next". A checkmark will appear if any entered numbers are non-negative.
-5.  **Step 5: References**
-    * List relevant Constitution articles and other references using the format **`Label | URI`** (one per line).
-    * Click "Next". A checkmark will appear (this step is also considered 'valid' for navigation, though references might be desired).
+5.  **Step 5: References (Optional)**
+    * Use the **Reference Library** dropdown to select common references (like CIPs, GovTool, Constitution) and add them to the appropriate text area below.
+    * Manually list relevant `Relevant Constitution Articles` and `Other References` using the format **`Label | URI`** (one per line).
+    * Click "Next". A checkmark will appear (this step is considered 'valid' for navigation, though references might be desired).
 6.  **Step 6: Review and Generate**
-    * Carefully review all the information displayed.
+    * Carefully review all the information displayed in the Review Area.
     * Use the "Previous" button to go back and make corrections if needed. Checkmarks on previous steps will update if changes affect their validity.
     * Click the **"Verify Metadata"** button.
     * A status message will appear indicating success or failure. Failures will point towards the likely step needing correction.
@@ -99,18 +105,18 @@ There are two ways to use this tool:
 
 This tool implements the metadata structure defined in:
 
-* **CIP-136:** Governance metadata - Constitutional Committee votes
-* **CIP-100:** Governance Metadata
+* **CIP-136:** Governance metadata - Constitutional Committee votes *(Link: `https://cips.cardano.org/cip/CIP-0136`)*
+* **CIP-100:** Governance Metadata *(Link: `https://cips.cardano.org/cip/CIP-0100`)*
 
-*(You might want to add direct links to the CIPs here if available, e.g., from the Cardano Foundation's CIP repository)*
+*(Links added based on `script.js`)*
 
 ## Contributing
 
 Contributions are welcome! Please feel free to:
 
-* Report bugs or suggest features by opening an issue.
-* Submit improvements by creating a pull request.
+* Report bugs or suggest features by opening an issue on the GitHub repository.
+* Submit improvements by creating a pull request on the GitHub repository: [https://github.com/Thomas-nada/Council-rationale-generator](https://github.com/Thomas-nada/Council-rationale-generator) *(Link updated based on `index.html`)*
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0 - see the `LICENSE` file for details.
