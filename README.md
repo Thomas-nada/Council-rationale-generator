@@ -1,8 +1,8 @@
-# Intersect Council Rationale Generator
+# Intersect CC Rationale Metadata Generator
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-A web-based tool for Intersect's Cardano Constitutional Committee members to generate CIP-136 compliant JSON metadata for vote rationales via a simple step-by-step process, adhering to the structure used in early examples.
+A web-based tool for Intersect's Constitutional Council members to generate CIP-136 compliant JSON metadata for vote rationales via a simple step-by-step process, adhering to the structure used in early examples.
 
 ## Motivation
 
