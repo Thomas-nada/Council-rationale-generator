@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intersect Counstitutional Council Rationale Metadata Generator</title>
+    <title>CIP-136 Rationale Metadata Generator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1>Intersect Counstitutional Council Rationale Metadata Generator</h1>
-    <form id="metadata-form" onsubmit="return false;"> <div class="step" id="step-1">
-            <h2>Step 1: Basic Information</h2>
+    <h1>CIP-136 Rationale Metadata Generator</h1>
+    <form id="metadata-form" onsubmit="return false;">
+
+        <div class="step" id="step-1">
+            <h2>Step 1: Basic Information <span class="step-status" id="status-step-1"></span></h2>
             <div class="form-group">
                 <label for="hashAlgorithm">Hash Algorithm:</label>
                 <input type="text" id="hashAlgorithm" placeholder="e.g., blake2b-256" value="blake2b-256" required>
@@ -27,12 +29,12 @@
                  <small>Name of the CC member(s) authoring this rationale. Required for the 'authors' array.</small>
             </div>
             <div class="navigation-buttons">
-                 <button type="button" onclick="nextStep()">Next</button>
+                <button type="button" onclick="nextStep()">Next</button>
             </div>
         </div>
 
         <div class="step" id="step-2" style="display: none;">
-            <h2>Step 2: Core Rationale (Compulsory)</h2>
+             <h2>Step 2: Core Rationale (Compulsory) <span class="step-status" id="status-step-2"></span></h2>
             <div class="form-group">
                 <label for="summary">Summary:</label>
                 <textarea id="summary" rows="4" maxlength="300" required></textarea>
@@ -50,7 +52,7 @@
         </div>
 
         <div class="step" id="step-3" style="display: none;">
-            <h2>Step 3: Supporting Discussion (Optional)</h2>
+             <h2>Step 3: Supporting Discussion (Optional) <span class="step-status" id="status-step-3"></span></h2>
             <div class="form-group">
                 <label for="precedentDiscussion">Precedent Discussion:</label>
                 <textarea id="precedentDiscussion" rows="6"></textarea>
@@ -73,7 +75,7 @@
         </div>
 
         <div class="step" id="step-4" style="display: none;">
-            <h2>Step 4: Internal Voting (Optional)</h2>
+             <h2>Step 4: Internal Voting (Optional) <span class="step-status" id="status-step-4"></span></h2>
             <p>If this CC member represents an organization/consortium with internal voting, provide the breakdown below.</p>
             <div class="form-group-inline">
                 <label for="internal_constitutional_votes">Constitutional Votes:</label>
@@ -103,7 +105,7 @@
         </div>
 
         <div class="step" id="step-5" style="display: none;">
-            <h2>Step 5: References</h2>
+             <h2>Step 5: References <span class="step-status" id="status-step-5"></span></h2>
             <p>Enter references using the format: <strong>Label | URI</strong> (one per line).</p>
             <div class="form-group">
                 <label for="relevantArticles">Relevant Constitution Articles:</label>
@@ -121,13 +123,15 @@
         </div>
 
          <div class="step" id="step-6" style="display: none;">
-            <h2>Step 6: Review and Generate</h2>
-            <p>Please review the information below. Go back to previous steps to make changes.</p>
+             <h2>Step 6: Review and Generate</h2>
+            <p>Please review the information below. Go back to previous steps to make changes if necessary. Click "Verify Metadata" to check for required fields before generating the file.</p>
             <div id="review-area">
                 </div>
+            <div id="verification-status" style="margin-top: 15px;"></div>
             <div class="navigation-buttons">
                 <button type="button" onclick="prevStep()">Previous</button>
-                <button type="button" id="generate-button" onclick="generateJson()">Generate JSON File</button>
+                <button type="button" id="verify-button" onclick="verifyMetadata()">Verify Metadata</button>
+                <button type="button" id="generate-button" onclick="generateJson()" disabled>Generate JSON File</button>
             </div>
             <div id="error-message" class="error"></div>
         </div>
