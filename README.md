@@ -60,7 +60,7 @@ There are two ways to use this tool:
 
 *(Steps updated based on `index.html` and `script.js`)*
 
-1.  **Step 1: Basic Information (Required Fields)**
+1.  **Step 1: Basic Information**
     * Enter the **Hash Algorithm** (defaults to `blake2b-256`). *Required*.
     * Optionally enter a **Subject** for your own reference (not included in the final JSON).
     * Enter the **Author(s)** details (one name per line or separated by semicolons). *Required*.
