@@ -1,140 +1,277 @@
+/* --- General Styles --- */
 body {
     font-family: sans-serif;
     line-height: 1.6;
     margin: 20px;
     background-color: #f4f4f4;
+    color: #333; /* Default text color */
 }
 
-h1, h2 {
+h1 {
+    text-align: center;
+    color: #333;
+    border-bottom: 2px solid #0056b3; /* Accent color */
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+
+h2 {
     color: #333;
     border-bottom: 1px solid #ccc;
     padding-bottom: 5px;
+    margin-top: 0; /* Remove default top margin for step headings */
 }
 
+/* --- Form Container --- */
 #metadata-form {
     background-color: #fff;
-    padding: 20px;
+    padding: 25px 30px; /* Increased padding */
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    max-width: 700px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Slightly larger shadow */
+    max-width: 800px; /* Increased max width */
     margin: auto;
 }
 
+/* --- Step Styling --- */
 .step {
-    padding: 15px;
+    padding: 20px;
     border: 1px solid #eee;
-    margin-bottom: 20px;
-    background-color: #fff; /* Ensure steps are white even if form bg changes */
+    margin-bottom: 25px;
+    background-color: #fff;
+    border-radius: 5px; /* Added slight rounding to steps */
 }
 
+/* --- Form Element Groups --- */
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px; /* Increased spacing */
 }
 
-.form-group label, .form-group-inline label {
+.form-group label,
+.form-group-inline label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px; /* Increased space below label */
     font-weight: bold;
     color: #555;
 }
 
+/* --- Input & Textarea Styling --- */
 .form-group input[type="text"],
 .form-group textarea,
 .form-group-inline input[type="number"] {
-    width: 95%; /* Adjusted for padding */
-    padding: 10px;
+    width: 98%; /* Adjusted for padding */
+    padding: 12px; /* Slightly larger padding */
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1rem;
+    transition: border-color 0.2s ease-in-out; /* Add transition */
 }
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus,
+.form-group-inline input[type="number"]:focus {
+    border-color: #007bff; /* Highlight on focus */
+    outline: none; /* Remove default outline */
+}
+
 
 .form-group textarea {
     resize: vertical; /* Allow vertical resize */
+    min-height: 80px; /* Minimum height */
 }
 
+/* --- Helper Text --- */
 .form-group small {
     display: block;
-    margin-top: 3px;
-    font-size: 0.85em;
+    margin-top: 5px; /* Increased space above small text */
+    font-size: 0.88em; /* Slightly larger */
     color: #666;
 }
+#summary-char-count {
+    font-weight: bold;
+}
 
-/* Specific style for inline elements like internal votes */
+/* --- Inline Form Groups (Internal Votes) --- */
 .form-group-inline {
-    margin-bottom: 10px;
-    display: flex; /* Use flexbox for alignment */
-    align-items: center; /* Vertically center items */
-    flex-wrap: wrap; /* Allow wrapping on small screens */
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .form-group-inline label {
-     width: 180px; /* Fixed width for labels */
-     margin-bottom: 0; /* Remove bottom margin */
-     margin-right: 10px; /* Add space between label and input */
-     flex-shrink: 0; /* Prevent label from shrinking */
+     width: 180px;
+     margin-bottom: 0;
+     margin-right: 10px;
+     flex-shrink: 0;
 }
 
 .form-group-inline input[type="number"] {
-    width: 100px; /* Smaller width for number inputs */
-    flex-grow: 1; /* Allow input to grow if needed */
-    max-width: 150px; /* But not too large */
+    width: 100px;
+    flex-grow: 0; /* Don't allow growth by default */
+    padding: 8px 10px; /* Slightly smaller padding for number inputs */
 }
 
-
+/* --- Navigation Buttons --- */
 .navigation-buttons {
-    margin-top: 20px;
+    margin-top: 25px; /* Increased spacing */
+    padding-top: 15px; /* Add padding above buttons */
+    border-top: 1px solid #eee; /* Separator line above buttons */
     display: flex;
-    justify-content: space-between; /* Puts Prev on left, Next/Generate on right */
+    justify-content: space-between;
 }
 
 .navigation-buttons button {
-    padding: 10px 20px;
+    padding: 12px 25px; /* Larger buttons */
     border: none;
     border-radius: 5px;
     background-color: #007bff;
     color: white;
     font-size: 1rem;
+    font-weight: bold; /* Bolder text */
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.1s ease; /* Added transform transition */
 }
-
 .navigation-buttons button:hover {
     background-color: #0056b3;
 }
+.navigation-buttons button:active {
+    transform: scale(0.98); /* Slight shrink on click */
+}
 
-.navigation-buttons button:first-child:not(:only-child) { /* Style Previous button differently if not the only button */
+
+/* Style Previous button differently */
+.navigation-buttons button:first-child:not(:only-child) {
      background-color: #6c757d;
 }
 .navigation-buttons button:first-child:not(:only-child):hover {
     background-color: #5a6268;
 }
 
-
-.error {
+/* --- Error Message Styling --- */
+.error, #error-message { /* Target both potential error divs */
     color: #dc3545; /* Bootstrap danger color */
     font-weight: bold;
-    margin-top: 10px;
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px solid #f5c6cb; /* Light red border */
+    background-color: #f8d7da; /* Light red background */
+    border-radius: 4px;
+    text-align: center;
 }
 
+/* --- Review Area (Step 6) Styling --- */
 #review-area {
-    background-color: #e9ecef;
-    padding: 15px;
+    background-color: #f8f9fa; /* Slightly off-white background */
+    padding: 15px 20px; /* Adjusted padding */
     border-radius: 5px;
-    margin-bottom: 15px;
-    white-space: pre-wrap; /* Preserve formatting */
-    word-wrap: break-word; /* Break long words */
-    max-height: 400px;
+    margin-bottom: 20px; /* Increased spacing */
+    border: 1px solid #dee2e6; /* Light grey border */
+    max-height: 600px; /* Allow more height */
     overflow-y: auto;
 }
-#review-area strong {
-    display: block;
-    margin-top: 10px;
-    color: #333;
+
+/* Style for each section within the review area */
+.review-section {
+    margin-bottom: 25px; /* Increased spacing */
+    padding-bottom: 20px; /* Increased spacing */
+    border-bottom: 1px dashed #ced4da; /* Dashed separator */
 }
-#review-area strong:first-child {
-    margin-top: 0;
+.review-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
-#summary-char-count {
+/* Section headings */
+.review-section h3 {
+    font-size: 1.2em; /* Slightly larger */
+    color: #495057; /* Dark grey */
+    margin-top: 0;
+    margin-bottom: 15px; /* Increased spacing */
+    border-bottom: none; /* Ensure no double borders */
+}
+
+/* Style for general values (paragraphs used for subject/author) */
+.review-value {
+    color: #333; /* Standard text color */
+    word-wrap: break-word;
+    display: block; /* Make paragraphs block-level */
+    margin-bottom: 10px; /* Space below paragraphs */
+}
+.review-section p.review-value:last-child {
+    margin-bottom: 0; /* No bottom margin on last paragraph in section */
+}
+
+
+/* Style for block values (preformatted text like summaries, rationales) */
+.review-block {
+    display: block; /* Ensure pre takes block space */
+    background-color: #fff;
+    border: 1px solid #e9ecef; /* Lighter border */
+    padding: 10px 15px; /* Adjusted padding */
+    border-radius: 4px;
+    margin-top: 5px; /* Space above block */
+    margin-bottom: 15px; /* Space below block */
+    white-space: pre-wrap; /* Wrap text */
+    font-family: inherit; /* Use body font */
+    font-size: 1em; /* Match body font size */
+    line-height: 1.5; /* Ensure readability */
+    max-height: 200px; /* Max height before scroll */
+    overflow-y: auto;
+    color: #333; /* Standard text color */
+}
+.review-section .review-block:last-child {
+    margin-bottom: 0; /* No bottom margin on last block in section */
+}
+
+/* Style for lists (votes, references) */
+.review-list {
+    list-style: none;
+    padding-left: 10px; /* Reduced indent for lists */
+    margin-top: 8px; /* Space above list */
+    margin-bottom: 0; /* Reset bottom margin */
+}
+.review-list li {
+    margin-bottom: 8px; /* Space between list items */
+    color: #495057;
+    line-height: 1.5; /* Ensure good line spacing */
+}
+/* Style for the implicit label part of list items */
+.review-list li::before {
+    /* Optional: Add a bullet or marker if desired */
+    /* content: "• "; */
+    /* color: #007bff; */
+    /* margin-right: 5px; */
+}
+
+
+/* Specific style for reference lists */
+.review-references li {
+    font-family: monospace; /* Keep monospace for URIs */
+    font-size: 0.95em;
+    word-break: break-all;
+    line-height: 1.4; /* Adjust line height for monospace */
+}
+.ref-description {
+    color: #6c757d; /* Subdued color for description */
+    font-style: italic;
+    margin-left: 8px;
+    font-family: sans-serif; /* Switch back for description */
+}
+
+/* Style for "Not provided" text (if you were to add it back in JS) */
+.review-value em {
+    color: #6c757d; /* Grey, italic */
+    font-style: italic;
+}
+
+/* Styles for the removed .review-label class (no longer used but harmless) */
+.review-label {
     font-weight: bold;
+    color: #343a40;
+    display: inline-block;
+}
+.review-section > p > .review-label {
+    display: block;
+    margin-bottom: 5px;
 }
