@@ -4,7 +4,7 @@ A web-based tool for Intersect's Constitutional Committee members to generate CI
 
 ## Motivation
 
-Cardano's governance framework (CIP-1694) introduces on-chain mechanisms, including Constitutional Committee (CC) votes. To ensure transparency and legitimacy, CIP-136 proposes a standard structure for CC members to provide detailed rationales for their votes, extending the base CIP-100 governance metadata standard[cite: 251, 252].
+Cardano's governance framework (CIP-1694) introduces on-chain mechanisms, including Constitutional Committee (CC) votes. To ensure transparency and legitimacy, CIP-136 proposes a standard structure for CC members to provide detailed rationales for their votes, extending the base CIP-100 governance metadata standard.
 
 Manually creating this structured JSON metadata, especially with the specific nested context seen in examples, can be tedious and error-prone. This tool aims to:
 
@@ -110,8 +110,8 @@ This tool implements the metadata structure defined in:
 Contributions are welcome! Please feel free to:
 
 * Report bugs or suggest features by opening an issue on the GitHub repository.
-* Submit improvements by creating a pull request on the GitHub repository: [https://github.com/Thomas-nada/Council-rationale-generator](https://github.com/Thomas-nada/Council-rationale-generator) *(Link updated based on `index.html`)*
-* Update the `constitutionArticles` array in `script.js` if the official Constitution structure changes.
+* Submit improvements by creating a pull request.
+* Create a pull request to update the `constitutionArticles` array in `script.js`
 
 ## License
 
