@@ -273,26 +273,25 @@
             background-size: .65em auto;
             padding-right: 2.5em;
         }
-        .form-group select[multiple] { /* Kept for potential future use, but authors is now checkboxes */
+        .form-group select[multiple] {
             min-height: 100px;
             padding: 8px;
         }
 
-        /* Styling for the authors checkbox group */
         .authors-checkbox-group {
             border: 1px solid var(--checkbox-group-border-color);
             background-color: var(--checkbox-group-bg-color);
             border-radius: 4px;
             padding: 10px;
-            max-height: 150px; /* Or desired height */
+            max-height: 150px;
             overflow-y: auto;
             width: 98%;
             box-sizing: border-box;
         }
         .authors-checkbox-group label {
-            display: block; /* Each checkbox on its own line */
+            display: block;
             margin-bottom: 6px;
-            font-weight: normal; /* Normal weight for options */
+            font-weight: normal;
             color: var(--text-color);
             cursor: pointer;
             padding: 4px 6px;
@@ -311,7 +310,7 @@
         .form-group input[type="text"]:focus,
         .form-group textarea:focus,
         .form-group select:focus,
-        .authors-checkbox-group:focus-within, /* Style container when a checkbox inside is focused */
+        .authors-checkbox-group:focus-within,
         .form-group-inline input[type="number"]:focus {
             border-color: var(--input-focus-border-color);
             outline: none;
@@ -377,7 +376,6 @@
             background-color: var(--library-btn-hover-bg-color);
         }
 
-        /* --- Navigation Buttons --- */
         .navigation-buttons {
             margin-top: 25px;
             padding-top: 15px;
@@ -764,12 +762,20 @@
                 <small>Hashing algorithm used (e.g., blake2b-256).</small>
             </div>
             <div class="form-group">
-                <label for="subject">Subject:</label>
-                <input type="text" id="subject" placeholder="e.g., Rationale for Vote on GovAction XYZ-123">
-                <small>A concise title or subject (Optional, not in final JSON structure, but used for filename).</small>
+                <label for="govActionType">Governance Action Type:</label>
+                <select id="govActionType" required>
+                    </select>
+                <small>Select the type of governance action. Required.</small>
             </div>
             <div class="form-group">
-                <label for="authors-checkbox-list">Author(s):</label> <div id="authors-checkbox-list" class="authors-checkbox-group" tabindex="0"> </div>
+                <label for="subject">Subject:</label>
+                <input type="text" id="subject" placeholder="e.g., Update to CIP-XXXX">
+                <small>A concise name for the governance action (e.g., 'CIP-XXXX Update'). This will be part of the filename.</small>
+            </div>
+            <div class="form-group">
+                <label for="authors-checkbox-list">Author(s):</label>
+                <div id="authors-checkbox-list" class="authors-checkbox-group" tabindex="0">
+                    </div>
                 <small>Select one or more authors. Required.</small>
             </div>
             <div class="navigation-buttons">
@@ -942,10 +948,21 @@
         const totalSteps = 6;
         const stepValidity = {};
 
-        const authorList = [ // Defined list of authors
+        const authorList = [
             "Intersect Constitutional Council", "Hosky", "Jose Miguel De Gambo", "Mercy Fordwoo",
             "Mauro Agustin Andreoli", "Ubio Obu", "Ian Hartwell", "Juan Sierra"
         ];
+
+        // Governance Action Types
+        const governanceActionTypes = {
+            "NC": "Motion of no-confidence",
+            "NCC": "New constitutional committee and/or threshold",
+            "UC": "Updates to the constitution",
+            "HF": "Hard-fork initiation",
+            "PPU": "Protocol parameter Updates",
+            "TW": "Treasury withdrawals",
+            "Info": "Info action"
+        };
 
         const referenceLibrary = [
             { label: "Cardano Blockchain Ecosystem Constitution", uri: "ipfs://bafkreiazhhawe7sjwuthcfgl3mmv2swec7sukvclu3oli7qdyz4uhhuvmy", isConstitution: true },
@@ -970,28 +987,33 @@
             "Appendix II Section 1: Framing Notes","Appendix II Section 2: Other Guidance"
         ];
 
-        // Function to populate author checkboxes
         function populateAuthorsCheckboxes() {
             const container = document.getElementById('authors-checkbox-list');
             if (!container) return;
-            container.innerHTML = ''; // Clear existing
+            container.innerHTML = '';
             authorList.forEach(authorName => {
-                const checkboxId = `author-${authorName.replace(/\s+/g, '-')}`; // Create a unique ID
+                const checkboxId = `author-${authorName.replace(/\s+/g, '-')}`;
                 const label = document.createElement('label');
                 label.htmlFor = checkboxId;
-
                 const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = checkboxId;
-                checkbox.value = authorName;
-                checkbox.name = 'authors'; // Group checkboxes
-
+                checkbox.type = 'checkbox'; checkbox.id = checkboxId; checkbox.value = authorName; checkbox.name = 'authors';
                 label.appendChild(checkbox);
                 label.appendChild(document.createTextNode(` ${authorName}`));
                 container.appendChild(label);
             });
         }
 
+        function populateGovActionTypeDropdown() {
+            const selectElement = document.getElementById('govActionType');
+            if (!selectElement) return;
+            selectElement.innerHTML = '<option value="">-- Select Governance Action Type --</option>'; // Add a default placeholder
+            for (const [abbr, fullName] of Object.entries(governanceActionTypes)) {
+                const option = document.createElement('option');
+                option.value = abbr;
+                option.textContent = `${fullName} (${abbr})`;
+                selectElement.appendChild(option);
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             const darkModeToggle = document.getElementById('darkModeToggle');
@@ -1015,7 +1037,8 @@
                 });
             }
 
-            populateAuthorsCheckboxes(); // Populate authors
+            populateAuthorsCheckboxes();
+            populateGovActionTypeDropdown(); // Populate new dropdown
             showStep(1);
             populateReferenceLibraryDropdown();
             updateReferenceDisplay('relevant');
@@ -1217,13 +1240,25 @@
             });
             if (!isValid) { stepValidity[stepNumber] = false; return false; }
 
+            const requiredSelects = stepEl.querySelectorAll('select[required]');
+            requiredSelects.forEach(select => {
+                if (isValid && select.value === "") {
+                    const fieldLabel = select.previousElementSibling?.textContent || select.id;
+                    firstErrMessage = `Please select a value for: ${fieldLabel.replace(':', '').trim()}`;
+                    if (showAlerts && typeof window !== 'undefined' && typeof window.alert === 'function') alert(firstErrMessage);
+                    select.focus(); isValid = false;
+                }
+            });
+            if (!isValid) { stepValidity[stepNumber] = false; return false; }
+
+
             if (stepNumber === 1) {
                 const selectedAuthors = Array.from(document.querySelectorAll('#authors-checkbox-list input[type="checkbox"]:checked'));
-                if (selectedAuthors.length === 0) { // Assuming authors are required
+                if (selectedAuthors.length === 0) {
                     firstErrMessage = `Please select at least one Author.`;
                     if (showAlerts && typeof window !== 'undefined' && typeof window.alert === 'function') alert(firstErrMessage);
                     const authorsContainer = document.getElementById('authors-checkbox-list');
-                    if(authorsContainer) authorsContainer.focus(); // Focus the container
+                    if(authorsContainer) authorsContainer.focus();
                     isValid = false;
                 }
             }
@@ -1262,6 +1297,12 @@
                     if (stepEl) {
                         const reqTextIns = stepEl.querySelectorAll('input[type="text"][required], textarea[required]');
                         for(const input of reqTextIns) { if(!input.value.trim()) { firstInvalidInputOrGroup = input; break; } }
+
+                        if (!firstInvalidInputOrGroup) {
+                            const reqSelects = stepEl.querySelectorAll('select[required]');
+                            for(const select of reqSelects) { if(select.value === "") { firstInvalidInputOrGroup = select; break; } }
+                        }
+
                         if (!firstInvalidInputOrGroup && stepNum === 1) {
                              const selectedAuthors = Array.from(document.querySelectorAll('#authors-checkbox-list input[type="checkbox"]:checked'));
                              if (selectedAuthors.length === 0) {
@@ -1274,6 +1315,7 @@
                         const fieldLabel = firstInvalidInputOrGroup.previousElementSibling?.textContent || firstInvalidInputOrGroup.id;
                         fieldName = firstInvalidInputOrGroup.id === 'hashAlgorithm' ? 'Hash Algorithm' : fieldLabel.replace(':', '').trim();
                         if (firstInvalidInputOrGroup.id === 'authors-checkbox-list') fieldName = "Author(s)";
+                        if (firstInvalidInputOrGroup.id === 'govActionType') fieldName = "Governance Action Type";
                     }
                     finalMsg = `Verification failed: Please check ${fieldName}.`;
                     showStep(stepNum); break;
@@ -1302,6 +1344,7 @@
 
             if (stepNumber === 1) {
                 formData.hashAlgorithm = document.getElementById('hashAlgorithm')?.value.trim() || '';
+                formData.govActionType = document.getElementById('govActionType')?.value || '';
                 formData.subject = document.getElementById('subject')?.value.trim() || '';
                 const selectedAuthors = [];
                 const authorCheckboxes = document.querySelectorAll('#authors-checkbox-list input[type="checkbox"]:checked');
@@ -1310,7 +1353,9 @@
             } else {
                 const inputs = stepEl.querySelectorAll('input, textarea, select');
                 inputs.forEach(input => {
-                    if (input.id !== 'manualRefLabel' && input.id !== 'manualRefUri' && input.id !== 'manualRefTarget' && input.id !== 'library-select' && !input.id.startsWith('const-art-')) {
+                    if (input.id !== 'manualRefLabel' && input.id !== 'manualRefUri' &&
+                        input.id !== 'manualRefTarget' && input.id !== 'library-select' &&
+                        !input.id.startsWith('const-art-') && input.name !== 'authors') {
                         formData[input.id] = input.value.trim();
                     }
                 });
@@ -1329,7 +1374,7 @@
         function nextStep() { const isValid = validateStep(currentStep); updateStepStatusDisplay(currentStep); if (isValid) { collectStepData(currentStep); if (currentStep < totalSteps) { showStep(currentStep + 1); }}}
         function prevStep() { collectStepData(currentStep); if (currentStep > 1) { showStep(currentStep - 1); }}
 
-        function parseAuthors(selectedAuthorsArray) { // Expects an array of names
+        function parseAuthors(selectedAuthorsArray) {
             if (!selectedAuthorsArray || !Array.isArray(selectedAuthorsArray) || selectedAuthorsArray.length === 0) {
                 return [];
             }
@@ -1342,7 +1387,6 @@
                 "body": { "@id": "CIP136:body", "@context": { "references": { "@id": "CIP100:references", "@container": "@set", "@context": { "GovernanceMetadata": "CIP100:GovernanceMetadataReference", "Other": "CIP100:OtherReference", "label": "CIP100:reference-label", "uri": "CIP100:reference-uri", "RelevantArticles": "CIP136:RelevantArticles" } }, "summary": "CIP136:summary", "rationaleStatement": "CIP136:rationaleStatement", "precedentDiscussion": "CIP136:precedentDiscussion", "counterargumentDiscussion": "CIP136:counterargumentDiscussion", "conclusion": "CIP136:conclusion", "internalVote": { "@id": "CIP136:internalVote", "@context": { "constitutional": "CIP136:constitutional", "unconstitutional": "CIP136:unconstitutional", "abstain": "CIP136:abstain", "didNotVote": "CIP136:didNotVote" } } } },
                 "authors": { "@id": "CIP100:authors", "@container": "@set", "@context": { "did": "@id", "name": "http://xmlns.com/foaf/0.1/name", "witness": { "@id": "CIP100:witness", "@context": { "witnessAlgorithm": "CIP100:witnessAlgorithm", "publicKey": "CIP100:publicKey", "signature": "CIP100:signature" } } } }
             };
-            // Ensure formData.authors is an array before passing to parseAuthors
             const authorsToParse = Array.isArray(formData.authors) ? formData.authors : [];
             const metadata = { "@context": context, "hashAlgorithm": formData.hashAlgorithm || "blake2b-256", "body": { "summary": formData.summary || "", "rationaleStatement": formData.rationaleStatement || "" }, "authors": parseAuthors(authorsToParse) };
             const body = metadata.body;
@@ -1366,11 +1410,14 @@
         function populateReviewArea() {
             const reviewArea = document.getElementById('review-area'); if (!reviewArea) return;
             let reviewHtml = '';
-            if (formData.hashAlgorithm || formData.subject || (formData.authors && formData.authors.length > 0) ) {
+            if (formData.hashAlgorithm || formData.govActionType || formData.subject || (formData.authors && formData.authors.length > 0) ) {
                 reviewHtml += `<div class="review-section"><h3>Basic Information</h3>`;
                 if (formData.hashAlgorithm) reviewHtml += `<p><span class="review-label">Hash Algorithm:</span> <span class="review-value">${escapeHtml(formData.hashAlgorithm)}</span></p>`;
-                if (formData.subject) reviewHtml += `<p><span class="review-label">Subject (for filename):</span> <span class="review-value">${escapeHtml(formData.subject)}</span></p>`;
-
+                if (formData.govActionType) {
+                    const fullGovActionName = governanceActionTypes[formData.govActionType] || formData.govActionType;
+                    reviewHtml += `<p><span class="review-label">Governance Action Type:</span> <span class="review-value">${escapeHtml(fullGovActionName)} (${escapeHtml(formData.govActionType)})</span></p>`;
+                }
+                if (formData.subject) reviewHtml += `<p><span class="review-label">Subject (Action Name):</span> <span class="review-value">${escapeHtml(formData.subject)}</span></p>`;
                 if (formData.authors && formData.authors.length > 0) {
                      reviewHtml += `<p><span class="review-label">Authors:</span> <span class="review-value">${escapeHtml(formData.authors.join('; '))}</span></p>`;
                 } else {
@@ -1430,6 +1477,21 @@
             if (genMdBtn) { genMdBtn.disabled = !isValid; }
         }
 
+        function getFilenameComponents() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`;
+
+            const govActionAbbr = (formData.govActionType || "unknown").toLowerCase(); // Convert to lowercase
+            const subjectText = (formData.subject ? formData.subject.trim().replace(/\s+/g, '-') : "untitled-action").toLowerCase(); // Convert to lowercase
+            const safeSubject = subjectText.replace(/[<>:"/\\|?*]+/g, '_');
+
+            return { formattedDate, govActionAbbr, safeSubject };
+        }
+
+
         function generateJson() {
             const errMsgDiv = document.getElementById('error-message');
             if (errMsgDiv) { errMsgDiv.textContent = ''; errMsgDiv.style.display = 'none'; }
@@ -1440,11 +1502,8 @@
                 const jsonString = JSON.stringify(metadataObject, null, 2);
                 const blob = new Blob([jsonString], { type: 'application/json' });
                 const link = document.createElement('a');
-                const today = new Date(); const year = today.getFullYear(); const month = String(today.getMonth() + 1).padStart(2, '0'); const day = String(today.getDate()).padStart(2, '0');
-                const formattedDate = `${year}-${month}-${day}`;
-                const subjectText = formData.subject ? formData.subject.trim() : "Untitled";
-                const safeSubject = subjectText.replace(/[<>:"/\\|?*]+/g, '_');
-                link.download = `${formattedDate} - ${safeSubject}.JSON`;
+                const { formattedDate, govActionAbbr, safeSubject } = getFilenameComponents();
+                link.download = `${formattedDate}-${govActionAbbr}-${safeSubject}.json`; // Lowercase extension
                 link.href = URL.createObjectURL(blob);
                 document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(link.href);
             } catch (error) {
@@ -1458,8 +1517,18 @@
             const getVal = (path, defaultValue = "Not provided") => {
                 let current = metadata;
                 for (const key of path.split('.')) { if (current && typeof current === 'object' && key in current) { current = current[key]; } else { return defaultValue; }}
-                return (current === null || current === undefined || current === "") ? defaultValue : current;
+                const value = (current === null || current === undefined || current === "") ? defaultValue : current;
+                return String(value).replace(/\n/g, '\n\n');
             };
+            const getGovActionFullName = (abbr) => governanceActionTypes[abbr] || abbr;
+
+            if (formData.govActionType) {
+                 md += `# Governance Action Type\n\n${getGovActionFullName(formData.govActionType)} (${formData.govActionType})\n\n`;
+            }
+            if (formData.subject) {
+                 md += `# Governance Action Name/Subject\n\n${formData.subject}\n\n`;
+            }
+
             md += `# Summary\n\n${getVal('body.summary', 'No summary provided.')}\n\n`;
             md += `# Rationale Statement\n\n${getVal('body.rationaleStatement', 'No rationale statement provided.')}\n\n`;
             md += `# Precedent Discussion\n\n${getVal('body.precedentDiscussion', 'No precedent discussion provided.')}\n\n`;
@@ -1496,11 +1565,8 @@
                 const markdownString = generateMarkdownContent(metadataObject);
                 const blob = new Blob([markdownString], { type: 'text/markdown;charset=utf-8' });
                 const link = document.createElement('a');
-                const today = new Date(); const year = today.getFullYear(); const month = String(today.getMonth() + 1).padStart(2, '0'); const day = String(today.getDate()).padStart(2, '0');
-                const formattedDate = `${year}-${month}-${day}`;
-                const subjectText = formData.subject ? formData.subject.trim() : "Untitled";
-                const safeSubject = subjectText.replace(/[<>:"/\\|?*]+/g, '_');
-                link.download = `${formattedDate} - ${safeSubject}.md`;
+                const { formattedDate, govActionAbbr, safeSubject } = getFilenameComponents();
+                link.download = `${formattedDate}-${govActionAbbr}-${safeSubject}.md`; // Lowercase extension
                 link.href = URL.createObjectURL(blob);
                 document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(link.href);
             } catch (error) {
