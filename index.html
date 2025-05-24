@@ -70,6 +70,9 @@
             --dark-mode-toggle-bg: #444;
             --dark-mode-toggle-text: #fff;
             --dark-mode-toggle-hover-bg: #555;
+            --checkbox-group-border-color: var(--input-border-color);
+            --checkbox-group-bg-color: var(--input-bg-color);
+            --checkbox-label-hover-bg: #f0f0f0;
         }
 
         body.dark-mode {
@@ -103,10 +106,10 @@
             --verify-btn-hover-bg-color: #eab308;
             --generate-btn-bg-color: #22c55e;
             --generate-btn-hover-bg-color: #16a34a;
-            --generate-md-btn-bg-color: #42a5f5; /* Lighter blue for MD button in dark mode */
+            --generate-md-btn-bg-color: #42a5f5;
             --generate-md-btn-hover-bg-color: #1e88e5;
             --disabled-btn-bg-color: #4b5563;
-            --disabled-btn-text-color: #777; /* Disabled text color for dark mode */
+            --disabled-btn-text-color: #777;
             --error-text-color: #fca5a5;
             --error-bg-color: #7f1d1d;
             --error-border-color: #991b1b;
@@ -136,6 +139,9 @@
             --dark-mode-toggle-bg: #e0e0e0;
             --dark-mode-toggle-text: #1a1a1a;
             --dark-mode-toggle-hover-bg: #cccccc;
+            --checkbox-group-border-color: var(--input-border-color);
+            --checkbox-group-bg-color: var(--input-bg-color);
+            --checkbox-label-hover-bg: #444;
         }
 
         /* --- General Styles --- */
@@ -254,7 +260,8 @@
             color: var(--text-color);
             box-sizing: border-box;
         }
-        .form-group select {
+
+        .form-group select:not([multiple]) {
             padding: 10px 12px;
             height: auto;
             -webkit-appearance: none;
@@ -266,9 +273,45 @@
             background-size: .65em auto;
             padding-right: 2.5em;
         }
+        .form-group select[multiple] { /* Kept for potential future use, but authors is now checkboxes */
+            min-height: 100px;
+            padding: 8px;
+        }
+
+        /* Styling for the authors checkbox group */
+        .authors-checkbox-group {
+            border: 1px solid var(--checkbox-group-border-color);
+            background-color: var(--checkbox-group-bg-color);
+            border-radius: 4px;
+            padding: 10px;
+            max-height: 150px; /* Or desired height */
+            overflow-y: auto;
+            width: 98%;
+            box-sizing: border-box;
+        }
+        .authors-checkbox-group label {
+            display: block; /* Each checkbox on its own line */
+            margin-bottom: 6px;
+            font-weight: normal; /* Normal weight for options */
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 3px;
+            transition: background-color 0.2s ease;
+        }
+        .authors-checkbox-group label:hover {
+            background-color: var(--checkbox-label-hover-bg);
+        }
+        .authors-checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+
         .form-group input[type="text"]:focus,
         .form-group textarea:focus,
         .form-group select:focus,
+        .authors-checkbox-group:focus-within, /* Style container when a checkbox inside is focused */
         .form-group-inline input[type="number"]:focus {
             border-color: var(--input-focus-border-color);
             outline: none;
@@ -344,16 +387,13 @@
             gap: 10px;
             flex-wrap: wrap;
         }
-        /* Removed specific Step 6 layout overrides to rely on the general .navigation-buttons flex properties */
 
-
-        /* General style for all navigation buttons, defaults to "Next" button style */
         .navigation-buttons button {
             padding: 12px 25px;
             border: none;
             border-radius: 5px;
-            background-color: var(--nav-btn-bg-color); /* Default to Next button blue */
-            color: white; /* Most nav buttons have white text */
+            background-color: var(--nav-btn-bg-color);
+            color: white;
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
@@ -729,9 +769,8 @@
                 <small>A concise title or subject (Optional, not in final JSON structure, but used for filename).</small>
             </div>
             <div class="form-group">
-                <label for="authors">Author(s):</label>
-                <textarea id="authors" rows="3" placeholder="Enter one author name per line or separate by semicolons. E.g., Org Name; Individual Name" required></textarea>
-                 <small>Name of the CC member(s) authoring this rationale. Required.</small>
+                <label for="authors-checkbox-list">Author(s):</label> <div id="authors-checkbox-list" class="authors-checkbox-group" tabindex="0"> </div>
+                <small>Select one or more authors. Required.</small>
             </div>
             <div class="navigation-buttons">
                 <button type="button" onclick="nextStep()">Next</button>
@@ -903,6 +942,11 @@
         const totalSteps = 6;
         const stepValidity = {};
 
+        const authorList = [ // Defined list of authors
+            "Intersect Constitutional Council", "Hosky", "Jose Miguel De Gambo", "Mercy Fordwoo",
+            "Mauro Agustin Andreoli", "Ubio Obu", "Ian Hartwell", "Juan Sierra"
+        ];
+
         const referenceLibrary = [
             { label: "Cardano Blockchain Ecosystem Constitution", uri: "ipfs://bafkreiazhhawe7sjwuthcfgl3mmv2swec7sukvclu3oli7qdyz4uhhuvmy", isConstitution: true },
             { label: "GovTool", uri: "https://gov.tools/" },
@@ -926,6 +970,29 @@
             "Appendix II Section 1: Framing Notes","Appendix II Section 2: Other Guidance"
         ];
 
+        // Function to populate author checkboxes
+        function populateAuthorsCheckboxes() {
+            const container = document.getElementById('authors-checkbox-list');
+            if (!container) return;
+            container.innerHTML = ''; // Clear existing
+            authorList.forEach(authorName => {
+                const checkboxId = `author-${authorName.replace(/\s+/g, '-')}`; // Create a unique ID
+                const label = document.createElement('label');
+                label.htmlFor = checkboxId;
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = checkboxId;
+                checkbox.value = authorName;
+                checkbox.name = 'authors'; // Group checkboxes
+
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(` ${authorName}`));
+                container.appendChild(label);
+            });
+        }
+
+
         document.addEventListener('DOMContentLoaded', () => {
             const darkModeToggle = document.getElementById('darkModeToggle');
             if (localStorage.getItem('theme') === 'dark') {
@@ -948,6 +1015,7 @@
                 });
             }
 
+            populateAuthorsCheckboxes(); // Populate authors
             showStep(1);
             populateReferenceLibraryDropdown();
             updateReferenceDisplay('relevant');
@@ -1124,7 +1192,7 @@
                 if (stepNumber === totalSteps) {
                     populateReviewArea();
                     const genBtn = document.getElementById('generate-button'); if(genBtn) genBtn.disabled = true;
-                    const genMdBtn = document.getElementById('generate-markdown-button'); if(genMdBtn) genMdBtn.disabled = true; // Disable MD button
+                    const genMdBtn = document.getElementById('generate-markdown-button'); if(genMdBtn) genMdBtn.disabled = true;
                     const verStatus = document.getElementById('verification-status'); if(verStatus) {verStatus.textContent = ''; verStatus.className = '';}
                     const errMsg = document.getElementById('error-message'); if(errMsg) {errMsg.textContent = ''; errMsg.style.display = 'none';}
                 }
@@ -1135,9 +1203,10 @@
         function validateStep(stepNumber, showAlerts = true) {
             const stepEl = document.getElementById(`step-${stepNumber}`);
             if (!stepEl) return false;
-            const reqInputs = stepEl.querySelectorAll('input[required], textarea[required]');
             let isValid = true; let firstErrMessage = '';
-            reqInputs.forEach(input => {
+
+            const requiredTextInputs = stepEl.querySelectorAll('input[type="text"][required], textarea[required]');
+            requiredTextInputs.forEach(input => {
                 if (isValid && !input.value.trim()) {
                     const fieldLabel = input.previousElementSibling?.textContent || input.id;
                     const fieldName = input.id === 'hashAlgorithm' ? 'Hash Algorithm' : fieldLabel.replace(':', '').trim();
@@ -1147,6 +1216,20 @@
                 }
             });
             if (!isValid) { stepValidity[stepNumber] = false; return false; }
+
+            if (stepNumber === 1) {
+                const selectedAuthors = Array.from(document.querySelectorAll('#authors-checkbox-list input[type="checkbox"]:checked'));
+                if (selectedAuthors.length === 0) { // Assuming authors are required
+                    firstErrMessage = `Please select at least one Author.`;
+                    if (showAlerts && typeof window !== 'undefined' && typeof window.alert === 'function') alert(firstErrMessage);
+                    const authorsContainer = document.getElementById('authors-checkbox-list');
+                    if(authorsContainer) authorsContainer.focus(); // Focus the container
+                    isValid = false;
+                }
+            }
+            if (!isValid) { stepValidity[stepNumber] = false; return false; }
+
+
             if (stepNumber === 2) {
                 const summary = document.getElementById('summary').value;
                 if (summary.length > 300) {
@@ -1175,10 +1258,23 @@
                 if (!validateStep(stepNum, false)) {
                     overallValid = false;
                     const stepEl = document.getElementById(`step-${stepNum}`);
-                    let firstInvalidInput = null;
-                    if (stepEl) { const reqIns = stepEl.querySelectorAll('input[required], textarea[required]'); for(const input of reqIns) { if(!input.value.trim()) { firstInvalidInput = input; break; } }}
-                    const fieldLabel = firstInvalidInput?.previousElementSibling?.textContent || `a required field in Step ${stepNum}`;
-                    const fieldName = firstInvalidInput?.id === 'hashAlgorithm' ? 'Hash Algorithm' : fieldLabel.replace(':', '').trim();
+                    let firstInvalidInputOrGroup = null;
+                    if (stepEl) {
+                        const reqTextIns = stepEl.querySelectorAll('input[type="text"][required], textarea[required]');
+                        for(const input of reqTextIns) { if(!input.value.trim()) { firstInvalidInputOrGroup = input; break; } }
+                        if (!firstInvalidInputOrGroup && stepNum === 1) {
+                             const selectedAuthors = Array.from(document.querySelectorAll('#authors-checkbox-list input[type="checkbox"]:checked'));
+                             if (selectedAuthors.length === 0) {
+                                 firstInvalidInputOrGroup = document.getElementById('authors-checkbox-list');
+                             }
+                        }
+                    }
+                    let fieldName = `a required field in Step ${stepNum}`;
+                    if (firstInvalidInputOrGroup) {
+                        const fieldLabel = firstInvalidInputOrGroup.previousElementSibling?.textContent || firstInvalidInputOrGroup.id;
+                        fieldName = firstInvalidInputOrGroup.id === 'hashAlgorithm' ? 'Hash Algorithm' : fieldLabel.replace(':', '').trim();
+                        if (firstInvalidInputOrGroup.id === 'authors-checkbox-list') fieldName = "Author(s)";
+                    }
                     finalMsg = `Verification failed: Please check ${fieldName}.`;
                     showStep(stepNum); break;
                 }
@@ -1203,12 +1299,23 @@
         function collectStepData(stepNumber) {
             const stepEl = document.getElementById(`step-${stepNumber}`);
             if (!stepEl) return;
-            const inputs = stepEl.querySelectorAll('input, textarea, select');
-            inputs.forEach(input => {
-                if (input.id !== 'manualRefLabel' && input.id !== 'manualRefUri' && input.id !== 'manualRefTarget' && input.id !== 'library-select' && !input.id.startsWith('const-art-')) {
-                    formData[input.id] = input.value.trim();
-                }
-            });
+
+            if (stepNumber === 1) {
+                formData.hashAlgorithm = document.getElementById('hashAlgorithm')?.value.trim() || '';
+                formData.subject = document.getElementById('subject')?.value.trim() || '';
+                const selectedAuthors = [];
+                const authorCheckboxes = document.querySelectorAll('#authors-checkbox-list input[type="checkbox"]:checked');
+                authorCheckboxes.forEach(checkbox => selectedAuthors.push(checkbox.value));
+                formData.authors = selectedAuthors;
+            } else {
+                const inputs = stepEl.querySelectorAll('input, textarea, select');
+                inputs.forEach(input => {
+                    if (input.id !== 'manualRefLabel' && input.id !== 'manualRefUri' && input.id !== 'manualRefTarget' && input.id !== 'library-select' && !input.id.startsWith('const-art-')) {
+                        formData[input.id] = input.value.trim();
+                    }
+                });
+            }
+
             if (stepNumber === 4) {
                 const numIds = ['internal_constitutional_votes', 'internal_unconstitutional_votes', 'internal_abstain_votes', 'internal_did_not_vote', 'internal_against_vote'];
                 numIds.forEach(id => {
@@ -1221,7 +1328,13 @@
 
         function nextStep() { const isValid = validateStep(currentStep); updateStepStatusDisplay(currentStep); if (isValid) { collectStepData(currentStep); if (currentStep < totalSteps) { showStep(currentStep + 1); }}}
         function prevStep() { collectStepData(currentStep); if (currentStep > 1) { showStep(currentStep - 1); }}
-        function parseAuthors(authorsString) { if (!authorsString) return []; return authorsString.split(/[\n;]+/).map(a => a.trim()).filter(a => a).map(name => ({ name: name }));}
+
+        function parseAuthors(selectedAuthorsArray) { // Expects an array of names
+            if (!selectedAuthorsArray || !Array.isArray(selectedAuthorsArray) || selectedAuthorsArray.length === 0) {
+                return [];
+            }
+            return selectedAuthorsArray.map(name => ({ name: name.trim() }));
+        }
 
         function buildMetadata() {
             const context = { /* ... as before ... */
@@ -1229,7 +1342,9 @@
                 "body": { "@id": "CIP136:body", "@context": { "references": { "@id": "CIP100:references", "@container": "@set", "@context": { "GovernanceMetadata": "CIP100:GovernanceMetadataReference", "Other": "CIP100:OtherReference", "label": "CIP100:reference-label", "uri": "CIP100:reference-uri", "RelevantArticles": "CIP136:RelevantArticles" } }, "summary": "CIP136:summary", "rationaleStatement": "CIP136:rationaleStatement", "precedentDiscussion": "CIP136:precedentDiscussion", "counterargumentDiscussion": "CIP136:counterargumentDiscussion", "conclusion": "CIP136:conclusion", "internalVote": { "@id": "CIP136:internalVote", "@context": { "constitutional": "CIP136:constitutional", "unconstitutional": "CIP136:unconstitutional", "abstain": "CIP136:abstain", "didNotVote": "CIP136:didNotVote" } } } },
                 "authors": { "@id": "CIP100:authors", "@container": "@set", "@context": { "did": "@id", "name": "http://xmlns.com/foaf/0.1/name", "witness": { "@id": "CIP100:witness", "@context": { "witnessAlgorithm": "CIP100:witnessAlgorithm", "publicKey": "CIP100:publicKey", "signature": "CIP100:signature" } } } }
             };
-            const metadata = { "@context": context, "hashAlgorithm": formData.hashAlgorithm || "blake2b-256", "body": { "summary": formData.summary || "", "rationaleStatement": formData.rationaleStatement || "" }, "authors": parseAuthors(formData.authors || "") };
+            // Ensure formData.authors is an array before passing to parseAuthors
+            const authorsToParse = Array.isArray(formData.authors) ? formData.authors : [];
+            const metadata = { "@context": context, "hashAlgorithm": formData.hashAlgorithm || "blake2b-256", "body": { "summary": formData.summary || "", "rationaleStatement": formData.rationaleStatement || "" }, "authors": parseAuthors(authorsToParse) };
             const body = metadata.body;
             if (formData.precedentDiscussion) body.precedentDiscussion = formData.precedentDiscussion;
             if (formData.counterargumentDiscussion) body.counterargumentDiscussion = formData.counterargumentDiscussion;
@@ -1251,14 +1366,16 @@
         function populateReviewArea() {
             const reviewArea = document.getElementById('review-area'); if (!reviewArea) return;
             let reviewHtml = '';
-            if (formData.hashAlgorithm || formData.subject || formData.authors) {
+            if (formData.hashAlgorithm || formData.subject || (formData.authors && formData.authors.length > 0) ) {
                 reviewHtml += `<div class="review-section"><h3>Basic Information</h3>`;
                 if (formData.hashAlgorithm) reviewHtml += `<p><span class="review-label">Hash Algorithm:</span> <span class="review-value">${escapeHtml(formData.hashAlgorithm)}</span></p>`;
                 if (formData.subject) reviewHtml += `<p><span class="review-label">Subject (for filename):</span> <span class="review-value">${escapeHtml(formData.subject)}</span></p>`;
-                const authorsList = parseAuthors(formData.authors || "");
-                if (authorsList.length > 0) { reviewHtml += `<p><span class="review-label">Authors:</span> <span class="review-value">${authorsList.map(a => escapeHtml(a.name)).join('; ')}</span></p>`; }
-                else if (formData.authors) { reviewHtml += `<p><span class="review-label">Authors:</span> <span class="review-value">${escapeHtml(formData.authors)}</span></p>`; }
-                else { reviewHtml += `<p><span class="review-label">Authors:</span> <span class="review-value"><em>Not provided</em></span></p>`;}
+
+                if (formData.authors && formData.authors.length > 0) {
+                     reviewHtml += `<p><span class="review-label">Authors:</span> <span class="review-value">${escapeHtml(formData.authors.join('; '))}</span></p>`;
+                } else {
+                     reviewHtml += `<p><span class="review-label">Authors:</span> <span class="review-value"><em>Not provided</em></span></p>`;
+                }
                 reviewHtml += `</div>`;
             }
             if (formData.summary || formData.rationaleStatement) {
@@ -1306,11 +1423,11 @@
         function verifyMetadata() {
             const verStatus = document.getElementById('verification-status');
             const genBtn = document.getElementById('generate-button');
-            const genMdBtn = document.getElementById('generate-markdown-button'); // Get MD button
+            const genMdBtn = document.getElementById('generate-markdown-button');
             const { isValid, message } = runFinalValidation();
             if (verStatus) { verStatus.textContent = message; verStatus.className = isValid ? 'success' : 'failure'; }
             if (genBtn) { genBtn.disabled = !isValid; }
-            if (genMdBtn) { genMdBtn.disabled = !isValid; } // Enable/disable MD button
+            if (genMdBtn) { genMdBtn.disabled = !isValid; }
         }
 
         function generateJson() {
@@ -1336,7 +1453,6 @@
             }
         }
 
-        // New function to generate Markdown content
         function generateMarkdownContent(metadata) {
             let md = "";
             const getVal = (path, defaultValue = "Not provided") => {
@@ -1365,7 +1481,7 @@
             md += "\n";
             md += `# Authors\n\n`;
             const authors = (metadata.authors && Array.isArray(metadata.authors)) ? metadata.authors : [];
-            if (authors.length > 0) { authors.forEach(author => { md += `- ${author.name || 'Unnamed Author'}\n`; });
+            if (authors.length > 0) { authors.forEach(authorObj => { md += `- ${authorObj.name || 'Unnamed Author'}\n`; });
             } else { md += "No authors listed.\n"; }
             return md.trim();
         }
