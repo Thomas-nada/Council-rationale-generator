@@ -757,26 +757,21 @@
         <div class="step" id="step-1">
             <h2>Step 1: Basic Information <span class="step-status" id="status-step-1"></span></h2>
             <div class="form-group">
-                <label for="hashAlgorithm">Hash Algorithm:</label>
-                <input type="text" id="hashAlgorithm" placeholder="e.g., blake2b-256" value="blake2b-256" required>
-                <small>Hashing algorithm used (e.g., blake2b-256).</small>
-            </div>
-            <div class="form-group">
                 <label for="govActionType">Governance Action Type:</label>
                 <select id="govActionType" required>
                     </select>
-                <small>Select the type of governance action. Required.</small>
+                <small>Required. Select the type of governance action. This will be used for filename.</small>
             </div>
             <div class="form-group">
-                <label for="subject">Subject:</label>
-                <input type="text" id="subject" placeholder="e.g., Budget for Project">
-                <small>A concise name for the governance action (e.g., 'Budget for Project'). This will be part of the filename.</small>
+                <label for="subject">Subject</label>
+                <input type="text" id="subject" placeholder="e.g. net-change-limit">
+                <small>A concise human readable name for the vote (e.g., 'Budget for Project'). This will be used for filename.</small>
             </div>
             <div class="form-group">
-                <label for="authors-checkbox-list">Author(s):</label>
+                <label for="authors-checkbox-list">Author(s)</label>
                 <div id="authors-checkbox-list" class="authors-checkbox-group" tabindex="0">
                     </div>
-                <small>Select one or more authors. Required.</small>
+                <small>Required. Select one or more authors.</small>
             </div>
             <div class="navigation-buttons">
                 <button type="button" onclick="nextStep()">Next</button>
@@ -784,15 +779,19 @@
         </div>
 
         <div class="step" id="step-2" style="display: none;">
-             <h2>Step 2: Core Rationale (Compulsory) <span class="step-status" id="status-step-2"></span></h2>
+             <h2>Step 2: Core Rationale (Required) <span class="step-status" id="status-step-2"></span></h2>
             <div class="form-group">
-                <label for="summary">Summary:</label>
-                <textarea id="summary" rows="4" maxlength="300" required></textarea>
+                <label for="summary">Summary</label> 
+                <textarea id="summary" rows="4" maxlength="300" required placeholder="Authors SHOULD use this field to clearly state their stance on the issue.
+Authors SHOULD use this field to succinctly describe their rationale.
+Authors SHOULD give a brief overview of the main arguments will support your position.
+"></textarea>
                 <small>Short statement (Max 300 chars). <span id="summary-char-count">0</span>/300</small>
             </div>
             <div class="form-group">
                 <label for="rationaleStatement">Rationale Statement:</label>
-                <textarea id="rationaleStatement" rows="10" required></textarea>
+                <textarea id="rationaleStatement" rows="10" required  placeholder="Authors SHOULD use this field to fully describe their rationale.
+Authors SHOULD discuss their arguments in full detail."></textarea>
                 <small>Full rationale. Markdown supported.</small>
             </div>
             <div class="navigation-buttons">
@@ -805,12 +804,12 @@
              <h2>Step 3: Supporting Discussion (Optional) <span class="step-status" id="status-step-3"></span></h2>
             <div class="form-group">
                 <label for="precedentDiscussion">Precedent Discussion:</label>
-                <textarea id="precedentDiscussion" rows="6"></textarea>
+                <textarea id="precedentDiscussion" rows="6" placeholder="The author SHOULD use this field to discuss what they feel is relevant precedent."></textarea>
                 <small>Discuss relevant precedent. Markdown supported.</small>
             </div>
             <div class="form-group">
                 <label for="counterargumentDiscussion">Counterargument Discussion:</label>
-                <textarea id="counterargumentDiscussion" rows="6"></textarea>
+                <textarea id="counterargumentDiscussion" rows="6" placeholder="The author SHOULD use this field to discuss significant counter arguments to the position taken."></textarea>
                 <small>Discuss significant counterarguments. Markdown supported.</small>
             </div>
             <div class="form-group">
@@ -846,7 +845,6 @@
             <div class="form-group-inline">
                 <label for="internal_against_vote">Votes Against Voting:</label>
                 <input type="number" id="internal_against_vote" min="0" step="1">
-                <small style="margin-left: 10px; width: auto;">(Note: This field is not part of the standard reference JSON structure)</small>
             </div>
             <div class="navigation-buttons">
                 <button type="button" onclick="prevStep()">Previous</button>
@@ -966,10 +964,6 @@
 
         const referenceLibrary = [
             { label: "Cardano Blockchain Ecosystem Constitution", uri: "ipfs://bafkreiazhhawe7sjwuthcfgl3mmv2swec7sukvclu3oli7qdyz4uhhuvmy", isConstitution: true },
-            { label: "GovTool", uri: "https://gov.tools/" },
-            { label: "CIP-100 (Governance Metadata)", uri: "https://cips.cardano.org/cip/CIP-0100" },
-            { label: "CIP-136 (CC Vote Metadata)", uri: "https://cips.cardano.org/cip/CIP-0136" },
-            { label: "CIP-1694 (Governance Framework)", uri: "https://cips.cardano.org/cip/CIP-1694" },
         ];
 
         const constitutionArticles = [
@@ -1384,11 +1378,11 @@
         function buildMetadata() {
             const context = { /* ... as before ... */
                 "@language": "en-us", "CIP100": "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#", "CIP136": "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0136/README.md#", "hashAlgorithm": "CIP100:hashAlgorithm",
-                "body": { "@id": "CIP136:body", "@context": { "references": { "@id": "CIP100:references", "@container": "@set", "@context": { "GovernanceMetadata": "CIP100:GovernanceMetadataReference", "Other": "CIP100:OtherReference", "label": "CIP100:reference-label", "uri": "CIP100:reference-uri", "RelevantArticles": "CIP136:RelevantArticles" } }, "summary": "CIP136:summary", "rationaleStatement": "CIP136:rationaleStatement", "precedentDiscussion": "CIP136:precedentDiscussion", "counterargumentDiscussion": "CIP136:counterargumentDiscussion", "conclusion": "CIP136:conclusion", "internalVote": { "@id": "CIP136:internalVote", "@context": { "constitutional": "CIP136:constitutional", "unconstitutional": "CIP136:unconstitutional", "abstain": "CIP136:abstain", "didNotVote": "CIP136:didNotVote" } } } },
+                "body": { "@id": "CIP136:body", "@context": { "references": { "@id": "CIP100:references", "@container": "@set", "@context": { "GovernanceMetadata": "CIP100:GovernanceMetadataReference", "Other": "CIP100:OtherReference", "label": "CIP100:reference-label", "uri": "CIP100:reference-uri", "RelevantArticles": "CIP136:RelevantArticles" } }, "summary": "CIP136:summary", "rationaleStatement": "CIP136:rationaleStatement", "precedentDiscussion": "CIP136:precedentDiscussion", "counterargumentDiscussion": "CIP136:counterargumentDiscussion", "conclusion": "CIP136:conclusion", "internalVote": { "@id": "CIP136:internalVote", "@context": { "constitutional": "CIP136:constitutional", "unconstitutional": "CIP136:unconstitutional", "abstain": "CIP136:abstain", "didNotVote": "CIP136:didNotVote", "againstVote": "CIP136:againstVote" } } } },
                 "authors": { "@id": "CIP100:authors", "@container": "@set", "@context": { "did": "@id", "name": "http://xmlns.com/foaf/0.1/name", "witness": { "@id": "CIP100:witness", "@context": { "witnessAlgorithm": "CIP100:witnessAlgorithm", "publicKey": "CIP100:publicKey", "signature": "CIP100:signature" } } } }
             };
             const authorsToParse = Array.isArray(formData.authors) ? formData.authors : [];
-            const metadata = { "@context": context, "hashAlgorithm": formData.hashAlgorithm || "blake2b-256", "body": { "summary": formData.summary || "", "rationaleStatement": formData.rationaleStatement || "" }, "authors": parseAuthors(authorsToParse) };
+            const metadata = { "@context": context, "hashAlgorithm": "blake2b-256", "body": { "summary": formData.summary || "", "rationaleStatement": formData.rationaleStatement || "" }, "authors": parseAuthors(authorsToParse) };
             const body = metadata.body;
             if (formData.precedentDiscussion) body.precedentDiscussion = formData.precedentDiscussion;
             if (formData.counterargumentDiscussion) body.counterargumentDiscussion = formData.counterargumentDiscussion;
@@ -1398,6 +1392,7 @@
             if (formData.internal_unconstitutional_votes !== null && formData.internal_unconstitutional_votes !== undefined) internalVoteData.unconstitutional = formData.internal_unconstitutional_votes;
             if (formData.internal_abstain_votes !== null && formData.internal_abstain_votes !== undefined) internalVoteData.abstain = formData.internal_abstain_votes;
             if (formData.internal_did_not_vote !== null && formData.internal_did_not_vote !== undefined) internalVoteData.didNotVote = formData.internal_did_not_vote;
+            if (formData.internal_against_vote !== null && formData.internal_against_vote !== undefined) internalVoteData.againstVote = formData.internal_against_vote;
             if (Object.keys(internalVoteData).length > 0) body.internalVote = internalVoteData;
             const allReferences = [];
             const processReference = (ref) => { const refObj = { "@type": "Other", label: ref.label, uri: ref.uri }; if (ref.isConstitution && ref.selectedArticles && ref.selectedArticles.length > 0) { refObj.RelevantArticles = ref.selectedArticles.join(', '); } allReferences.push(refObj); };
@@ -1410,12 +1405,11 @@
         function populateReviewArea() {
             const reviewArea = document.getElementById('review-area'); if (!reviewArea) return;
             let reviewHtml = '';
-            if (formData.hashAlgorithm || formData.govActionType || formData.subject || (formData.authors && formData.authors.length > 0) ) {
+            if (formData.govActionType || formData.subject || (formData.authors && formData.authors.length > 0) ) {
                 reviewHtml += `<div class="review-section"><h3>Basic Information</h3>`;
-                if (formData.hashAlgorithm) reviewHtml += `<p><span class="review-label">Hash Algorithm:</span> <span class="review-value">${escapeHtml(formData.hashAlgorithm)}</span></p>`;
                 if (formData.govActionType) {
                     const fullGovActionName = governanceActionTypes[formData.govActionType] || formData.govActionType;
-                    reviewHtml += `<p><span class="review-label">Governance Action Type:</span> <span class="review-value">${escapeHtml(fullGovActionName)} (${escapeHtml(formData.govActionType)})</span></p>`;
+                    reviewHtml += `<p><span class="review-label">Governance Action Type</span> <span class="review-value">${escapeHtml(fullGovActionName)} (${escapeHtml(formData.govActionType)})</span></p>`;
                 }
                 if (formData.subject) reviewHtml += `<p><span class="review-label">Subject (Action Name):</span> <span class="review-value">${escapeHtml(formData.subject)}</span></p>`;
                 if (formData.authors && formData.authors.length > 0) {
