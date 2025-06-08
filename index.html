@@ -757,26 +757,21 @@
         <div class="step" id="step-1">
             <h2>Step 1: Basic Information <span class="step-status" id="status-step-1"></span></h2>
             <div class="form-group">
-                <label for="hashAlgorithm">Hash Algorithm:</label>
-                <input type="text" id="hashAlgorithm" placeholder="e.g., blake2b-256" value="blake2b-256" required>
-                <small>Hashing algorithm used (e.g., blake2b-256).</small>
-            </div>
-            <div class="form-group">
                 <label for="govActionType">Governance Action Type:</label>
                 <select id="govActionType" required>
                     </select>
-                <small>Select the type of governance action. Required.</small>
+                <small>Required. Select the type of governance action. This will be used for filename.</small>
             </div>
             <div class="form-group">
-                <label for="subject">Subject:</label>
-                <input type="text" id="subject" placeholder="e.g., Budget for Project">
-                <small>A concise name for the governance action (e.g., 'Budget for Project'). This will be part of the filename.</small>
+                <label for="subject">Subject</label>
+                <input type="text" id="subject" placeholder="e.g. net-change-limit">
+                <small>A concise human readable name for the vote (e.g., 'Budget for Project'). This will be used for filename.</small>
             </div>
             <div class="form-group">
-                <label for="authors-checkbox-list">Author(s):</label>
+                <label for="authors-checkbox-list">Author(s)</label>
                 <div id="authors-checkbox-list" class="authors-checkbox-group" tabindex="0">
                     </div>
-                <small>Select one or more authors. Required.</small>
+                <small>Required. Select one or more authors.</small>
             </div>
             <div class="navigation-buttons">
                 <button type="button" onclick="nextStep()">Next</button>
@@ -784,15 +779,19 @@
         </div>
 
         <div class="step" id="step-2" style="display: none;">
-             <h2>Step 2: Core Rationale (Compulsory) <span class="step-status" id="status-step-2"></span></h2>
+             <h2>Step 2: Core Rationale (Required) <span class="step-status" id="status-step-2"></span></h2>
             <div class="form-group">
-                <label for="summary">Summary:</label>
-                <textarea id="summary" rows="4" maxlength="300" required></textarea>
+                <label for="summary">Summary</label> 
+                <textarea id="summary" rows="4" maxlength="300" required placeholder="Authors SHOULD use this field to clearly state their stance on the issue.
+Authors SHOULD use this field to succinctly describe their rationale.
+Authors SHOULD give a brief overview of the main arguments will support your position.
+"></textarea>
                 <small>Short statement (Max 300 chars). <span id="summary-char-count">0</span>/300</small>
             </div>
             <div class="form-group">
                 <label for="rationaleStatement">Rationale Statement:</label>
-                <textarea id="rationaleStatement" rows="10" required></textarea>
+                <textarea id="rationaleStatement" rows="10" required  placeholder="Authors SHOULD use this field to fully describe their rationale.
+Authors SHOULD discuss their arguments in full detail."></textarea>
                 <small>Full rationale. Markdown supported.</small>
             </div>
             <div class="navigation-buttons">
@@ -805,12 +804,12 @@
              <h2>Step 3: Supporting Discussion (Optional) <span class="step-status" id="status-step-3"></span></h2>
             <div class="form-group">
                 <label for="precedentDiscussion">Precedent Discussion:</label>
-                <textarea id="precedentDiscussion" rows="6"></textarea>
+                <textarea id="precedentDiscussion" rows="6" placeholder="The author SHOULD use this field to discuss what they feel is relevant precedent."></textarea>
                 <small>Discuss relevant precedent. Markdown supported.</small>
             </div>
             <div class="form-group">
                 <label for="counterargumentDiscussion">Counterargument Discussion:</label>
-                <textarea id="counterargumentDiscussion" rows="6"></textarea>
+                <textarea id="counterargumentDiscussion" rows="6" placeholder="The author SHOULD use this field to discuss significant counter arguments to the position taken."></textarea>
                 <small>Discuss significant counterarguments. Markdown supported.</small>
             </div>
             <div class="form-group">
@@ -1383,7 +1382,7 @@
                 "authors": { "@id": "CIP100:authors", "@container": "@set", "@context": { "did": "@id", "name": "http://xmlns.com/foaf/0.1/name", "witness": { "@id": "CIP100:witness", "@context": { "witnessAlgorithm": "CIP100:witnessAlgorithm", "publicKey": "CIP100:publicKey", "signature": "CIP100:signature" } } } }
             };
             const authorsToParse = Array.isArray(formData.authors) ? formData.authors : [];
-            const metadata = { "@context": context, "hashAlgorithm": formData.hashAlgorithm || "blake2b-256", "body": { "summary": formData.summary || "", "rationaleStatement": formData.rationaleStatement || "" }, "authors": parseAuthors(authorsToParse) };
+            const metadata = { "@context": context, "hashAlgorithm": "blake2b-256", "body": { "summary": formData.summary || "", "rationaleStatement": formData.rationaleStatement || "" }, "authors": parseAuthors(authorsToParse) };
             const body = metadata.body;
             if (formData.precedentDiscussion) body.precedentDiscussion = formData.precedentDiscussion;
             if (formData.counterargumentDiscussion) body.counterargumentDiscussion = formData.counterargumentDiscussion;
@@ -1406,12 +1405,11 @@
         function populateReviewArea() {
             const reviewArea = document.getElementById('review-area'); if (!reviewArea) return;
             let reviewHtml = '';
-            if (formData.hashAlgorithm || formData.govActionType || formData.subject || (formData.authors && formData.authors.length > 0) ) {
+            if (formData.govActionType || formData.subject || (formData.authors && formData.authors.length > 0) ) {
                 reviewHtml += `<div class="review-section"><h3>Basic Information</h3>`;
-                if (formData.hashAlgorithm) reviewHtml += `<p><span class="review-label">Hash Algorithm:</span> <span class="review-value">${escapeHtml(formData.hashAlgorithm)}</span></p>`;
                 if (formData.govActionType) {
                     const fullGovActionName = governanceActionTypes[formData.govActionType] || formData.govActionType;
-                    reviewHtml += `<p><span class="review-label">Governance Action Type:</span> <span class="review-value">${escapeHtml(fullGovActionName)} (${escapeHtml(formData.govActionType)})</span></p>`;
+                    reviewHtml += `<p><span class="review-label">Governance Action Type</span> <span class="review-value">${escapeHtml(fullGovActionName)} (${escapeHtml(formData.govActionType)})</span></p>`;
                 }
                 if (formData.subject) reviewHtml += `<p><span class="review-label">Subject (Action Name):</span> <span class="review-value">${escapeHtml(formData.subject)}</span></p>`;
                 if (formData.authors && formData.authors.length > 0) {
